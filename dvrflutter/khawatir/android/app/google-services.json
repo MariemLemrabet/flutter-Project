@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "139226985617",
+    "project_id": "khawatir-d3394",
+    "storage_bucket": "khawatir-d3394.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139226985617:android:36b0eabdeefd431a107b30",
+        "android_client_info": {
+          "package_name": "com.example.khawatir"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB__8M4cyjkIbLraBALwB6gVSNqv3vgXNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
