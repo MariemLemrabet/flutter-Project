@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:khawatir/data/services/firebase_auth_service.dart';
+import 'package:khawatir/presentation/screens/sign_up_screen.dart';
 
 class loginscrine extends StatefulWidget {
   const loginscrine({super.key});
@@ -17,11 +18,12 @@ class _loginscrineState extends State<loginscrine> {
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
+  
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    
     super.dispose();
   }
 
@@ -47,6 +49,7 @@ class _loginscrineState extends State<loginscrine> {
                 ),
                 //Subtitle
                 SizedBox(height: 20),
+               
                 //Email Textfield
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -104,7 +107,7 @@ class _loginscrineState extends State<loginscrine> {
                           style: GoogleFonts.robotoCondensed(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 25,
                           ),
                         ),
                       ),
@@ -140,22 +143,35 @@ class _loginscrineState extends State<loginscrine> {
 
   void _goToSignUp() {
     // Navigate to the signup page
-    Navigator.pushNamed(context, 'SignUpScreen');
+    Navigator.pushNamed(context, 'SiginUpnscrine');
   }
 
   void _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
-
+    
     User? user = await _auth.signIn(email, password);
     if (user != null) {
       print('singin ');
       // Clear text fields
-      _emailController.text = "";
-      _passwordController.text = "";
-      Navigator.pushNamed(context, 'HomeScreen');
+      
+      _emailController.clear();
+      _passwordController.clear();
+      Navigator.pushNamed(context, 'CreatePostScreen');
     } else {
-      print('Some error happend');
+      // Show SnackBar with an error message
+      _showErrorSnackBar('User does not exist or login failed');
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Center(
+          child: Text(message, textAlign: TextAlign.center),
+        ),
+        duration: Duration(seconds: 5), // Adjust the duration as needed
+      ),
+    );
   }
 }

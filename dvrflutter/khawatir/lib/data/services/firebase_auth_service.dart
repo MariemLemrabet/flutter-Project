@@ -20,7 +20,7 @@ class FirebaseAuthService {
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: email, password: password );
       return credential.user;
     } catch (e) {
       print("som error occured");

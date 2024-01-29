@@ -126,7 +126,7 @@ class _SiginUpnscrineState extends State<SiginUpnscrine> {
                           style: GoogleFonts.robotoCondensed(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 25,
                           ),
                         ),
                       ),
