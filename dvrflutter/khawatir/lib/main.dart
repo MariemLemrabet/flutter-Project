@@ -36,7 +36,7 @@ class khawatir extends StatelessWidget {
         'CreatePostScreen': (context) => CreatePostScreen(),
         // ... other routes ...
       },
-      home: loginscrine(),
+      home: CreatePostScreen(),
     );
   }
 }
