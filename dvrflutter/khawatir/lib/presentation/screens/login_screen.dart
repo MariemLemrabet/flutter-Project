@@ -157,7 +157,7 @@ class _loginscrineState extends State<loginscrine> {
       
       _emailController.clear();
       _passwordController.clear();
-      Navigator.pushNamed(context, 'CreatePostScreen');
+      Navigator.pushNamed(context, 'HomeScreen');
     } else {
       // Show SnackBar with an error message
       _showErrorSnackBar('User does not exist or login failed');

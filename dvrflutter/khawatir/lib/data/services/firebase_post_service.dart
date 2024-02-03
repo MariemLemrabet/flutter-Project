@@ -1,21 +1,33 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:khawatir/data/entities/post.dart';
 
 class FirebasePostService {
-  final CollectionReference postsCollection =
-      FirebaseFirestore.instance.collection('posts');
+  final CollectionReference postsCollection =FirebaseFirestore.instance.collection('posts');
+      
 
-  Future<void> addPost(String postText, String email) async {
-    try {
-      await postsCollection.add({
-        'text': postText,
-        'timestamp': FieldValue.serverTimestamp(),
-        'email': email,
-        
-      });
-    } catch (e) {
-      // ignore: avoid_print
-      print('Error adding post: $e');
-      // Handle error as needed
-    }
+  Future addPost(String postText) async {
+    final String? email = FirebaseAuth.instance.currentUser!.email;
+    await postsCollection.add({
+      'text': postText,
+      'timestamp': DateTime.now(),
+      'email': email,
+    });
+  }
+
+   // Fonction pour récupérer tous les posts sous forme de flux
+  Stream<QuerySnapshot> getAllPosts() {
+    return postsCollection.orderBy('timestamp',descending: true).snapshots();
+  }
+   Future<void> editPost(String docId, String postText) async {
+    final String? email = FirebaseAuth.instance.currentUser!.email;
+    await postsCollection.doc(docId).update({
+      'text': postText,
+      'timestamp': DateTime.now(),
+      'email': email,
+    });
   }
 }

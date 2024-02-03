@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, override_on_non_overriding_member
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,26 +6,28 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:khawatir/data/services/firebase_post_service.dart';
 import 'package:khawatir/presentation/screens/home_screen.dart';
 
-class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({Key? key}) : super(key: key);
+class EditPostScreen extends StatefulWidget {
+  final String bodyText;
+  final String docId;
+  const EditPostScreen({Key? key, required this.bodyText, required this.docId}) : super(key: key);
 
   @override
-  _CreatePostScreenState createState() => _CreatePostScreenState();
+  _EditPostScreenState createState() => _EditPostScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
-  TextEditingController _postTextController = TextEditingController();
+class _EditPostScreenState extends State<EditPostScreen> {
+  TextEditingController _editTextController = TextEditingController();
   bool _buttonClicked = false;
 
   @override
-  void dispose() {
-    _postTextController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _editTextController.text = widget.bodyText;
   }
 
   BoxDecoration _buttonDecoration() {
     return BoxDecoration(
-      color: _buttonClicked || _postTextController.text.isEmpty
+      color: _buttonClicked || _editTextController.text.isEmpty
           ? Colors.grey
           : Colors.amber,
       shape: BoxShape.circle,
@@ -39,45 +41,45 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   Future<void> _onSubmitButtonPressed() async {
-  if (!_buttonClicked && _postTextController.text.isNotEmpty) {
-    try {
-      setState(() {
-        _buttonClicked = true; // Mettez à jour _buttonClicked avant l'envoi
-      });
+    if (!_buttonClicked && _editTextController.text.isNotEmpty) {
+      try {
+        setState(() {
+          _buttonClicked = true; // Mettez à jour _buttonClicked avant l'envoi
+        });
 
-      await _submitPost();
+        await _submitPost();
 
-      // Naviguer vers la page HomeScreen après l'envoi du post
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-    } catch (e) {
-      print('Error submitting post: $e');
-      // Gérer l'erreur si l'envoi du post échoue
-      _showErrorSnackBar('Error submitting post. Please try again.');
-    } finally {
-      setState(() {
-        _buttonClicked = false; // Réactivez le bouton après l'envoi (succès ou échec)
-      });
+        // Naviguer vers la page HomeScreen après l'envoi du post
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } catch (e) {
+        print('Error submitting post: $e');
+        // Gérer l'erreur si l'envoi du post échoue
+        _showErrorSnackBar('Error submitting post. Please try again.');
+      } finally {
+        setState(() {
+          _buttonClicked =
+              false; // Réactivez le bouton après l'envoi (succès ou échec)
+        });
+      }
+    } else {
+      _showErrorSnackBar('Please enter your post text.');
     }
-  } else {
-    _showErrorSnackBar('Please enter your post text.');
   }
-}
-
 
   Future<void> _submitPost() async {
-    String postText = _postTextController.text;
+    String postText = _editTextController.text;
 
     User? currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
       FirebasePostService _postService = FirebasePostService();
 
-      await _postService.addPost(postText);
+      await _postService.editPost(widget.docId, postText);
 
-      _postTextController.text = "";
+      _editTextController.text = "";
     } else {
       _showErrorSnackBar('User not authenticated.');
     }
@@ -106,7 +108,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               children: [
                 SizedBox(height: 50),
                 Text(
-                  'CREATE POST',
+                  'EDIT POST',
                   style: GoogleFonts.robotoCondensed(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
@@ -116,7 +118,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 _buildPostTextField(),
                 SizedBox(height: 20),
                 _buildSubmitButton(),
-                 SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
           ),
@@ -136,7 +138,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: TextField(
-            controller: _postTextController,
+            controller: _editTextController,
             maxLines: null,
             onChanged: (text) {
               _onTextChanged();
@@ -179,6 +181,5 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
       ),
     );
-  
   }
 }

@@ -27,4 +27,6 @@ class FirebaseAuthService {
     }
     return null;
   }
+
+  createUserWithEmailAndPassword({required String email, required String password}) {}
 }
