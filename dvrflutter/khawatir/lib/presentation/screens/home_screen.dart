@@ -9,7 +9,34 @@ import 'package:khawatir/presentation/screens/PostScreen.dart';
 
 class HomeScreen extends StatelessWidget {
   final FirebasePostService _postService = FirebasePostService();
-  final String? usemail =FirebaseAuth.instance.currentUser!.email;
+  final String? usemail = FirebaseAuth.instance.currentUser!.email;
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, String docId) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Voulez-vous vraiment supprimer ce post ?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue sans supprimer
+              },
+              child: Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _postService.deletePost(docId); // Supprimer le post
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue après la suppression
+              },
+              child: Text('Supprimer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,24 +45,27 @@ class HomeScreen extends StatelessWidget {
         automaticallyImplyLeading: false, // Masquer le bouton de retour
         actions: [
           IconButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, 'loginscrine');
-              },
-              icon: const Icon(Icons.exit_to_app, color: Colors.amber))
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacementNamed(context, 'loginscrine');
+            },
+            icon: const Icon(Icons.exit_to_app, color: Colors.amber),
+          )
         ],
         title: Text('Home Screen'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const CreatePostScreen();
-              });
+            context: context,
+            builder: (BuildContext context) {
+              return const CreatePostScreen();
+            },
+          );
         },
         child: Icon(Icons.post_add_sharp),
         backgroundColor: Colors.amber,
+        shape: CircleBorder(),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _postService.getAllPosts(),
@@ -55,8 +85,7 @@ class HomeScreen extends StatelessWidget {
           return ListView(
             children: snapshot.data!.docs.map(
               (DocumentSnapshot document) {
-                Map<String, dynamic>? data =
-                    document.data() as Map<String, dynamic>?;
+                Map<String, dynamic>? data = document.data() as Map<String, dynamic>?;
 
                 if (data == null ||
                     !data.containsKey('email') ||
@@ -64,24 +93,30 @@ class HomeScreen extends StatelessWidget {
                   // Le document ne contient pas les champs attendus, gérer cette situation
                   return ListTile(
                     title: Text('Invalid document'),
-                    subtitle: Text(
-                        'This document does not contain email and text fields.'),
+                    subtitle: Text('This document does not contain email and text fields.'),
                   );
                 }
+
                 return Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: 5, left: 10, right: 10),
+                  padding: const EdgeInsets.only(bottom: 5, left: 10, right: 10),
                   child: GestureDetector(
+                    onTap: () {
+                      // Afficher la boîte de dialogue de confirmation avant de supprimer le post
+                      if (usemail == data['email']) {
+                        _showDeleteConfirmationDialog(context, document.id);
+                      }
+                    },
                     onDoubleTap: () {
                       if (usemail == data['email']) {
                         showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return  EditPostScreen(
-                                bodyText: data['text'],
-                                docId: document.id,
-                              );
-                            });
+                          context: context,
+                          builder: (BuildContext context) {
+                            return EditPostScreen(
+                              bodyText: data['text'],
+                              docId: document.id,
+                            );
+                          },
+                        );
                       }
                     },
                     child: Stack(
@@ -89,9 +124,9 @@ class HomeScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Colors.amber.withOpacity(0.1),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8))),
+                            color: Colors.amber.withOpacity(0.1),
+                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          ),
                           child: ListTile(
                             title: Text(
                               data['email'],
@@ -109,12 +144,6 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                       usemail==data['email']? IconButton(onPressed: (){
-                         _postService.deletePost(document.id);
-                       }, 
-                        icon: Icon(Icons.delete_outline_sharp,
-                        color: Colors.red.withOpacity(0.8),))
-                        :Container()
                       ],
                     ),
                   ),

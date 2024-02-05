@@ -29,7 +29,7 @@ class _PostFormState extends State<PostForm> {
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -39,11 +39,12 @@ class _PostFormState extends State<PostForm> {
               onChanged: (text) {
                  widget.updateButtonDecoration();// Mettre à jour la décoration du bouton lorsque le texte change
               },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 30),
-                border: InputBorder.none,
-                hintText: 'Write your post...',
-              ),
+             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 30),
+              border: InputBorder.none,
+              hintText: 'Write your post...',
+            ),
+            
             ),
           ),
         ),
@@ -74,6 +75,7 @@ class _PostFormState extends State<PostForm> {
             ),
           ),
         ),
+        SizedBox(height: 20),
       ],
     );
   }
