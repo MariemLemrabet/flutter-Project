@@ -2,8 +2,6 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:khawatir/presentation/screens/EditPost.dart';
-import 'package:khawatir/presentation/screens/PostScreen.dart';
 import 'package:khawatir/presentation/screens/home_screen.dart';
 import 'package:khawatir/presentation/screens/login_screen.dart';
 
@@ -31,11 +29,10 @@ class khawatir extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: const Color.fromARGB(255, 243, 226, 33)),
       routes: {
-        'HomeScreen': (context) =>HomeScreen(),
+        'HomeScreen': (context) => HomeScreen(),
         'SiginUpnscrine': (context) => SiginUpnscrine(),
         'loginscrine': (context) => loginscrine(),
-        'CreatePostScreen': (context) => CreatePostScreen(),
-       
+
         // ... other routes ...
       },
       home: loginscrine(),

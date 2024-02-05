@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:khawatir/data/services/firebase_post_service.dart';
 import 'package:khawatir/presentation/screens/home_screen.dart';
+import 'package:khawatir/presentation/widgets/PostForm.dart';
 
 class EditPostScreen extends StatefulWidget {
   final String bodyText;
   final String docId;
-  const EditPostScreen({Key? key, required this.bodyText, required this.docId}) : super(key: key);
+
+  const EditPostScreen({Key? key, required this.bodyText, required this.docId})
+      : super(key: key);
 
   @override
   _EditPostScreenState createState() => _EditPostScreenState();
@@ -25,43 +28,62 @@ class _EditPostScreenState extends State<EditPostScreen> {
     _editTextController.text = widget.bodyText;
   }
 
-  BoxDecoration _buttonDecoration() {
-    return BoxDecoration(
-      color: _buttonClicked || _editTextController.text.isEmpty
-          ? Colors.grey
-          : Colors.amber,
-      shape: BoxShape.circle,
-    );
+  void _updateButtonDecoration() {
+    setState(() {
+      _buttonClicked = _editTextController.text.isEmpty;
+    });
   }
 
-  void _onTextChanged() {
-    setState(() {
-      // Mettre à jour la décoration du bouton lorsque le texte change
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Color.fromARGB(255, 254, 254, 208),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: 50),
+                Text(
+                  'EDIT POST',
+                  style: GoogleFonts.robotoCondensed(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                PostForm(
+                  controller: _editTextController,
+                  buttonClicked: _buttonClicked,
+                  onSubmitPressed: _onSubmitButtonPressed,
+                  updateButtonDecoration: _updateButtonDecoration,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _onSubmitButtonPressed() async {
     if (!_buttonClicked && _editTextController.text.isNotEmpty) {
       try {
         setState(() {
-          _buttonClicked = true; // Mettez à jour _buttonClicked avant l'envoi
+          _buttonClicked = true;
         });
 
         await _submitPost();
 
-        // Naviguer vers la page HomeScreen après l'envoi du post
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       } catch (e) {
         print('Error submitting post: $e');
-        // Gérer l'erreur si l'envoi du post échoue
         _showErrorSnackBar('Error submitting post. Please try again.');
       } finally {
         setState(() {
-          _buttonClicked =
-              false; // Réactivez le bouton après l'envoi (succès ou échec)
+          _buttonClicked = false;
         });
       }
     } else {
@@ -93,92 +115,6 @@ class _EditPostScreenState extends State<EditPostScreen> {
         ),
         duration: Duration(seconds: 5),
         behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Color.fromARGB(255, 254, 254, 208),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-                SizedBox(height: 50),
-                Text(
-                  'EDIT POST',
-                  style: GoogleFonts.robotoCondensed(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 30),
-                _buildPostTextField(),
-                SizedBox(height: 20),
-                _buildSubmitButton(),
-                SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPostTextField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: TextField(
-            controller: _editTextController,
-            maxLines: null,
-            onChanged: (text) {
-              _onTextChanged();
-            },
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 30),
-              border: InputBorder.none,
-              hintText: 'Write your post...',
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: GestureDetector(
-        onTap: () {
-          _onSubmitButtonPressed();
-        },
-        child: Container(
-          width: 70,
-          height: 70,
-          decoration: _buttonDecoration(),
-          child: Center(
-            child: _buttonClicked
-                ? CircularProgressIndicator(
-                    color: Colors.white,
-                  )
-                : Center(
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-          ),
-        ),
       ),
     );
   }

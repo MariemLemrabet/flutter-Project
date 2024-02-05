@@ -9,7 +9,7 @@ import 'package:khawatir/presentation/screens/PostScreen.dart';
 
 class HomeScreen extends StatelessWidget {
   final FirebasePostService _postService = FirebasePostService();
-  final User? currentUser = FirebaseAuth.instance.currentUser;
+  final String? usemail =FirebaseAuth.instance.currentUser!.email;
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +73,6 @@ class HomeScreen extends StatelessWidget {
                       const EdgeInsets.only(bottom: 5, left: 10, right: 10),
                   child: GestureDetector(
                     onDoubleTap: () {
-                      final String? usemail =
-                          FirebaseAuth.instance.currentUser!.email;
                       if (usemail == data['email']) {
                         showDialog(
                             context: context,
@@ -86,28 +84,38 @@ class HomeScreen extends StatelessWidget {
                             });
                       }
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8))),
-                      child: ListTile(
-                        title: Text(
-                          data['email'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8))),
+                          child: ListTile(
+                            title: Text(
+                              data['email'],
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            subtitle: Text(
+                              data['text'],
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
-                        subtitle: Text(
-                          data['text'],
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
+                       usemail==data['email']? IconButton(onPressed: (){
+                         _postService.deletePost(document.id);
+                       }, 
+                        icon: Icon(Icons.delete_outline_sharp,
+                        color: Colors.red.withOpacity(0.8),))
+                        :Container()
+                      ],
                     ),
                   ),
                 );
