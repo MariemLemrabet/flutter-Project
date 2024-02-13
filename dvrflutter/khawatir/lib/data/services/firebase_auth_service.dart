@@ -20,7 +20,7 @@ class FirebaseAuthService {
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password );
+          email: email, password: password);
       return credential.user;
     } catch (e) {
       print("som error occured");
@@ -28,5 +28,23 @@ class FirebaseAuthService {
     return null;
   }
 
-  createUserWithEmailAndPassword({required String email, required String password}) {}
+  createUserWithEmailAndPassword(
+      {required String email, required String password}) {}
+  // Méthode pour vérifier si un utilisateur est déjà connecté
+  Future<User?> checkCurrentUser() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Utilisateur déjà connecté
+        return user;
+      } else {
+        // Utilisateur déconnecté
+        return null;
+      }
+    } catch (e) {
+      print(
+          "Une erreur s'est produite lors de la vérification de l'utilisateur actuel : $e");
+      return null;
+    }
+  }
 }

@@ -35,7 +35,9 @@ class khawatir extends StatelessWidget {
 
         // ... other routes ...
       },
+
       home: loginscrine(),
     );
+    
   }
 }
